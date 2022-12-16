@@ -1,16 +1,21 @@
-from django.shortcuts import render
-from rest_framework import status
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.http import JsonResponse
-from api.serializer import MyTokenObtainPairSerializer, RegisterSerializer
+
+from .serializer import MyTokenObtainPairSerializer, RegisterSerializer,PostSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import generics
 from django.contrib.auth.models import User
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes
-
+from rest_framework.permissions import AllowAny
+from .models import Posts
+from django_filters.rest_framework import DjangoFilterBackend
+from .service import PostFilter
+from rest_framework.decorators import api_view
 # Create your views here.
+
+class PostsList(generics.ListAPIView):
+    serializer_class = PostSerializer
+    queryset = Posts.objects.all()
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = PostFilter
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -23,25 +28,11 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
 
+
 @api_view(['GET'])
-def getRoutes(request):
-    routes = [
-        '/api/token/',
-        '/api/register/',
-        '/api/token/refresh/',
-        '/api/prediction/'
-    ]
-    return Response(routes)
+def get_level(request):
+    return Response('1;208;32 4;309;50')
 
 
-@api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
-def testEndPoint(request):
-    if request.method == 'GET':
-        data = f"Congratulation {request.user}, your API just responded to GET request"
-        return Response({'response': data}, status=status.HTTP_200_OK)
-    elif request.method == 'POST':
-        text = request.POST.get('text')
-        data = f'Congratulation your API just responded to POST request with text: {text}'
-        return Response({'response': data}, status=status.HTTP_200_OK)
-    return Response({}, status.HTTP_400_BAD_REQUEST)
+
+

@@ -34,6 +34,8 @@ export const AuthProvider = ({ children }) => {
     });
     const data = await response.json();
 
+
+
     if (response.status === 200) {
       setAuthTokens(data);
       setUser(jwt_decode(data.access));
